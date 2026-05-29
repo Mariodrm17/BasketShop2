@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
+from fastapi.encoders import jsonable_encoder
 from pydantic import ValidationError
 
 from app.config import settings
@@ -53,7 +54,7 @@ async def conflict_handler(request: Request, exc: ConflictError):
 async def request_validation_handler(request: Request, exc: RequestValidationError):
     return JSONResponse(
         status_code=422,
-        content={"error": "Datos de entrada inválidos", "details": exc.errors()},
+        content={"error": "Datos de entrada inválidos", "details": jsonable_encoder(exc.errors())},
     )
 
 
@@ -61,7 +62,7 @@ async def request_validation_handler(request: Request, exc: RequestValidationErr
 async def validation_error_handler(request: Request, exc: ValidationError):
     return JSONResponse(
         status_code=422,
-        content={"error": "Datos de entrada inválidos", "details": exc.errors()},
+        content={"error": "Datos de entrada inválidos", "details": jsonable_encoder(exc.errors())},
     )
 
 
