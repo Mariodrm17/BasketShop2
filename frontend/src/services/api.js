@@ -73,3 +73,13 @@ export const addToCart = (productId, token) =>
 
 export const removeFromCart = (productId, token) =>
   request('DELETE', `/cart/${productId}`, null, token)
+
+// Pedidos
+export const checkout = (token) =>
+  request('POST', '/orders/checkout', null, token)
+
+export const getMyOrders = (token) =>
+  request('GET', '/orders/my', null, token)
+
+export const getAllOrders = (token) =>
+  request('GET', '/orders', null, token)

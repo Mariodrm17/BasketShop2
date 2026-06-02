@@ -25,6 +25,12 @@ A continuación se indican los endpoints implementados y el nivel de acceso requ
 | GET | /api/cart | User/Admin | Ver carrito del usuario autenticado |
 | POST | /api/cart/add | User/Admin | Añadir producto al carrito |
 | DELETE | /api/cart/{product_id} | User/Admin | Quitar producto del carrito |
+| POST | /api/orders/checkout | User/Admin | Finalizar compra — crea pedido y vacía el carrito |
+| GET | /api/orders/my | User/Admin | Historial de pedidos del usuario autenticado |
+| GET | /api/orders | Admin | Listar todos los pedidos de la plataforma |
+| GET | /api/productos/{id} | Público | Obtener un producto individual por ID |
+| GET | /api/me | User/Admin | Perfil del usuario autenticado vía JWT |
+| GET | /api/health | Público | Estado del servidor y conexión a base de datos |
 
 ---
 

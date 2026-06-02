@@ -8,6 +8,7 @@
   import Usuarios from './pages/Usuarios.svelte'
   import Perfil from './pages/Perfil.svelte'
   import Carrito from './pages/Carrito.svelte'
+  import Pedidos from './pages/Pedidos.svelte'
 
   // Navegación SPA
   let currentPage = $state('productos')
@@ -22,7 +23,12 @@
   })
 
   $effect(() => {
-    if (auth.isAuthenticated && currentPage === 'usuarios' && !auth.isAdmin) {
+    if (!auth.isAuthenticated) return
+    if (currentPage === 'usuarios' && !auth.isAdmin) {
+      currentPage = 'productos'
+      toast.error('Acceso denegado: solo administradores')
+    }
+    if (currentPage === 'pedidos-admin' && !auth.isAdmin) {
       currentPage = 'productos'
       toast.error('Acceso denegado: solo administradores')
     }
@@ -50,6 +56,10 @@
         <Perfil />
       {:else if currentPage === 'carrito'}
         <Carrito />
+      {:else if currentPage === 'pedidos'}
+        <Pedidos />
+      {:else if currentPage === 'pedidos-admin' && auth.isAdmin}
+        <Pedidos />
       {:else}
         <Productos />
       {/if}
@@ -80,6 +90,24 @@
         >
           <span class="tab-item__icon">◎</span>
           <span class="tab-item__label">Usuarios</span>
+        </button>
+      {/if}
+
+      {#if auth.isAdmin}
+        <button
+          class="tab-item {currentPage === 'pedidos-admin' ? 'tab-item--active' : ''}"
+          onclick={() => currentPage = 'pedidos-admin'}
+        >
+          <span class="tab-item__icon">📦</span>
+          <span class="tab-item__label">Pedidos</span>
+        </button>
+      {:else}
+        <button
+          class="tab-item {currentPage === 'pedidos' ? 'tab-item--active' : ''}"
+          onclick={() => currentPage = 'pedidos'}
+        >
+          <span class="tab-item__icon">📦</span>
+          <span class="tab-item__label">Mis pedidos</span>
         </button>
       {/if}
 

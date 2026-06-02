@@ -35,5 +35,9 @@ class CartRepository:
             db.commit()
         return self.get_by_user(db, user_id)
 
+    def clear(self, db: Session, user_id: int) -> None:
+        db.query(CartItem).filter(CartItem.user_id == user_id).delete()
+        db.commit()
+
 
 cart_repository = CartRepository()

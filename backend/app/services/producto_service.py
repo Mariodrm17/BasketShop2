@@ -26,6 +26,17 @@ def get_productos(db: Session, name: Optional[str] = None) -> list[dict]:
     return [producto_to_dict(p) for p in producto_repository.get_all(db, name)]
 
 
+def get_producto(db: Session, product_id: str) -> dict:
+    try:
+        pid = int(product_id)
+    except ValueError:
+        raise NotFoundError("ID de producto inválido")
+    product = producto_repository.get_by_id(db, pid)
+    if not product:
+        raise NotFoundError("Producto no encontrado")
+    return producto_to_dict(product)
+
+
 async def create_producto(
     db: Session,
     nombre: str,

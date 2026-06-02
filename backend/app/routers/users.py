@@ -4,10 +4,15 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.schemas.user import UserCreate, UserUpdate
 from app.services.user_service import get_users, create_user, update_user, delete_user
-from app.dependencies.auth import get_current_admin
+from app.dependencies.auth import get_current_admin, get_current_user
 from app.exceptions import NotFoundError, ConflictError
 
 router = APIRouter()
+
+
+@router.get("/me")
+def get_me(current_user=Depends(get_current_user)):
+    return {"_id": str(current_user.id), "username": current_user.username, "role": current_user.role}
 
 
 @router.get("/users")

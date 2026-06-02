@@ -1,17 +1,28 @@
 import os
-from fastapi import FastAPI, Request
+import time
+import logging
+from fastapi import FastAPI, Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from fastapi.encoders import jsonable_encoder
 from pydantic import ValidationError
+from sqlalchemy import text
+from sqlalchemy.orm import Session
 
 from app.config import settings
 from app import models  # noqa: F401 — registra los modelos en SQLAlchemy
-from app.database import engine, Base
-from app.routers import auth, users, productos, cart
+from app.database import engine, Base, get_db
+from app.routers import auth, users, productos, cart, orders
 from app.exceptions import NotFoundError, UnauthorizedError, ForbiddenError, ConflictError
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s  %(levelname)-8s  %(message)s",
+    datefmt="%H:%M:%S",
+)
+logger = logging.getLogger("basketshop")
 
 # Crea tablas y carpeta de subidas
 Base.metadata.create_all(bind=engine)
@@ -26,6 +37,17 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# --- Middleware de logging de peticiones ---
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    start = time.time()
+    response = await call_next(request)
+    ms = (time.time() - start) * 1000
+    logger.info("%s %s → %s (%.1fms)", request.method, request.url.path, response.status_code, ms)
+    return response
 
 
 # --- Manejadores globales de excepciones ---
@@ -79,8 +101,19 @@ app.include_router(auth.router, prefix="/api")
 app.include_router(users.router, prefix="/api")
 app.include_router(productos.router, prefix="/api")
 app.include_router(cart.router, prefix="/api")
+app.include_router(orders.router, prefix="/api")
 
 
 @app.get("/")
 def root():
     return {"message": "BasketShop API v2 — Python / FastAPI"}
+
+
+@app.get("/api/health")
+def health_check(db: Session = Depends(get_db)):
+    try:
+        db.execute(text("SELECT 1"))
+        db_status = "connected"
+    except Exception:
+        return JSONResponse(status_code=503, content={"status": "error", "database": "disconnected"})
+    return {"status": "ok", "database": db_status, "version": "2.0.0"}

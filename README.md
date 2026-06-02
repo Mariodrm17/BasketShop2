@@ -16,11 +16,11 @@ BasketShop2/
 │   │   ├── config.py             # Configuración centralizada (pydantic-settings)
 │   │   ├── database.py           # Motor SQLAlchemy y sesión
 │   │   ├── exceptions.py         # Excepciones de dominio personalizadas
-│   │   ├── models/               # Modelos ORM (User, Producto, CartItem)
+│   │   ├── models/               # Modelos ORM (User, Producto, CartItem, Order, OrderItem)
 │   │   ├── schemas/              # Esquemas Pydantic (validación de entrada/salida)
 │   │   ├── repositories/         # Acceso a datos (patrón repositorio)
 │   │   ├── services/             # Lógica de negocio
-│   │   ├── routers/              # Controladores HTTP (auth, users, productos, cart)
+│   │   ├── routers/              # Controladores HTTP (auth, users, productos, cart, orders)
 │   │   └── dependencies/         # Dependencias FastAPI (autenticación JWT)
 │   ├── uploads/                  # Imágenes subidas por el admin
 │   ├── requirements.txt
@@ -98,17 +98,19 @@ Accede en **http://localhost:5173**. El Vite proxy redirige `/api` → `http://l
 | Método | Ruta                  | Auth   | Descripción              |
 |--------|-----------------------|--------|--------------------------|
 | GET    | /api/productos        | —      | Listar (filtra con ?name=)|
+| GET    | /api/productos/{id}   | —      | Obtener producto por ID  |
 | POST   | /api/productos        | Admin  | Crear (multipart/form-data)|
 | PUT    | /api/productos/{id}   | Admin  | Actualizar (JSON)        |
 | DELETE | /api/productos/{id}   | Admin  | Eliminar                 |
 
-### Usuarios (solo admin)
-| Método | Ruta              | Auth  | Descripción   |
-|--------|-------------------|-------|---------------|
-| GET    | /api/users        | Admin | Listar        |
-| POST   | /api/users        | Admin | Crear         |
-| PUT    | /api/users/{id}   | Admin | Actualizar    |
-| DELETE | /api/users/{id}   | Admin | Eliminar      |
+### Usuarios
+| Método | Ruta              | Auth       | Descripción              |
+|--------|-------------------|------------|--------------------------|
+| GET    | /api/me           | User/Admin | Perfil del usuario actual|
+| GET    | /api/users        | Admin      | Listar todos             |
+| POST   | /api/users        | Admin      | Crear                    |
+| PUT    | /api/users/{id}   | Admin      | Actualizar               |
+| DELETE | /api/users/{id}   | Admin      | Eliminar                 |
 
 ### Carrito (usuario autenticado)
 | Método | Ruta                    | Auth | Descripción          |
@@ -116,6 +118,18 @@ Accede en **http://localhost:5173**. El Vite proxy redirige `/api` → `http://l
 | GET    | /api/cart               | User | Ver carrito          |
 | POST   | /api/cart/add           | User | Añadir producto      |
 | DELETE | /api/cart/{product_id}  | User | Quitar producto      |
+
+### Pedidos
+| Método | Ruta                   | Auth       | Descripción                    |
+|--------|------------------------|------------|--------------------------------|
+| POST   | /api/orders/checkout   | User/Admin | Finalizar compra (carrito→pedido)|
+| GET    | /api/orders/my         | User/Admin | Historial de pedidos propios   |
+| GET    | /api/orders            | Admin      | Todos los pedidos              |
+
+### Sistema
+| Método | Ruta         | Auth | Descripción                         |
+|--------|--------------|------|-------------------------------------|
+| GET    | /api/health  | —    | Estado del servidor y BD            |
 
 ---
 

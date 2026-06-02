@@ -38,10 +38,23 @@
 
     {#if auth.isAdmin}
       <button
+        class="nav-link {currentPage === 'pedidos-admin' ? 'nav-link--active' : ''}"
+        onclick={() => navigate('pedidos-admin')}
+      >
+        Pedidos
+      </button>
+      <button
         class="nav-link {currentPage === 'usuarios' ? 'nav-link--active' : ''}"
         onclick={() => navigate('usuarios')}
       >
         Usuarios
+      </button>
+    {:else}
+      <button
+        class="nav-link {currentPage === 'pedidos' ? 'nav-link--active' : ''}"
+        onclick={() => navigate('pedidos')}
+      >
+        Mis pedidos
       </button>
     {/if}
   </div>

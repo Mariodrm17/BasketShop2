@@ -4,7 +4,7 @@ from typing import Optional
 
 from app.database import get_db
 from app.schemas.producto import ProductoUpdate
-from app.services.producto_service import get_productos, create_producto, update_producto, delete_producto
+from app.services.producto_service import get_productos, get_producto, create_producto, update_producto, delete_producto
 from app.dependencies.auth import get_current_admin
 from app.exceptions import NotFoundError
 
@@ -14,6 +14,14 @@ router = APIRouter()
 @router.get("/productos")
 def list_productos(name: Optional[str] = None, db: Session = Depends(get_db)):
     return get_productos(db, name)
+
+
+@router.get("/productos/{product_id}")
+def get_producto_endpoint(product_id: str, db: Session = Depends(get_db)):
+    try:
+        return get_producto(db, product_id)
+    except NotFoundError as e:
+        raise HTTPException(status_code=404, detail=e.message)
 
 
 @router.post("/productos", status_code=201)

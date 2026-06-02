@@ -1,7 +1,7 @@
 <script>
   import { auth } from '../stores/auth.svelte.js'
   import { toast } from '../stores/toast.svelte.js'
-  import { getCart, removeFromCart } from '../services/api.js'
+  import { getCart, removeFromCart, checkout as doCheckout } from '../services/api.js'
 
   let cart = $state([])
   let loading = $state(true)
@@ -40,13 +40,17 @@
     }
   }
 
-  function checkout() {
+  async function checkout() {
     processing = true
-    setTimeout(() => {
-      toast.success('¡Compra realizada con éxito! 🎉')
+    try {
+      const order = await doCheckout(auth.token)
       cart = []
+      toast.success(`¡Pedido #${order._id} realizado! Total: ${order.total.toFixed(2)} EUR`)
+    } catch (e) {
+      toast.error('No se pudo finalizar el pedido: ' + e.message)
+    } finally {
       processing = false
-    }, 1500)
+    }
   }
 
   function getImgSrc(img) {
